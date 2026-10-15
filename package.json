@@ -4,19 +4,24 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/copy-cutout-model.mjs",
     "dev": "vite",
+    "prephone": "node scripts/copy-cutout-model.mjs",
     "phone": "vite --host --mode phone",
+    "prebuild": "node scripts/copy-cutout-model.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host"
   },
   "dependencies": {
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@fontsource/space-mono": "^5.3.0",
+    "@imgly/background-removal": "^1.4.5",
     "idb-keyval": "^6.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
+    "@imgly/background-removal-data": "^1.4.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-basic-ssl": "^2.3.0",

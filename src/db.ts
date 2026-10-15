@@ -32,3 +32,12 @@ export async function getLot(id: string): Promise<Lot | undefined> {
 export async function addLot(lot: Lot): Promise<void> {
   await set(VISITOR_LOTS, [...(await visitorLots()), lot], store)
 }
+
+/** Object and citizen numbers already in the Archive, so new ones never repeat. */
+export async function takenNumbers(): Promise<{ obj: Set<string>; citizen: Set<string> }> {
+  const lots = await listLots()
+  return {
+    obj: new Set(lots.map((l) => l.objNumber)),
+    citizen: new Set(lots.map((l) => l.citizenNumber)),
+  }
+}

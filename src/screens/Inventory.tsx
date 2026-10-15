@@ -3,6 +3,7 @@ import { Brand } from '../components/Brand'
 import { LotCard } from '../components/LotCard'
 import { Pill } from '../components/Pill'
 import { TabBar } from '../components/TabBar'
+import { preloadCutoutModel } from '../cutout'
 import { listLots } from '../db'
 import { href } from '../router'
 import type { Lot } from '../types'
@@ -20,6 +21,9 @@ export function Inventory() {
 
   useEffect(() => {
     listLots().then(setLots, () => setError(true))
+    // Fetch the background-removal model quietly, so the first scan doesn't wait for it.
+    const idle = setTimeout(preloadCutoutModel, 1500)
+    return () => clearTimeout(idle)
   }, [])
 
   useLayoutEffect(() => {

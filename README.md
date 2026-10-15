@@ -57,3 +57,17 @@ This is expected: the certificate is made on your computer, and https is require
 2. **Add New… → Project**, choose `archive-scanner`, click **Deploy**. No settings to change.
 3. Every push to `main` updates the main link. Other branches get their own preview link,
    shown on the project's **Deployments** page.
+
+## Background removal
+
+Objects are cut out on the phone itself with
+[@imgly/background-removal](https://github.com/imgly/background-removal-js) (small model, ~44 MB).
+The model is served by this app from `/cutout/`. `scripts/copy-cutout-model.mjs` copies it there
+before every build, so nothing depends on an outside server. Each phone downloads it once,
+quietly in the background while the Inventory is open, and keeps it for offline use.
+
+If the background can't be removed, the photo is kept, cropped to a circle, and the visitor
+can carry on.
+
+The library is licensed under the AGPL, which asks that this app's source code stays public.
+This repository being public covers that.

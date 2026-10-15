@@ -2,7 +2,7 @@ import { useLayoutEffect } from 'react'
 import { useRoute } from './router'
 import { Inventory } from './screens/Inventory'
 import { ItemDetail } from './screens/ItemDetail'
-import { ScanSoon } from './screens/ScanSoon'
+import { Catalogue } from './screens/catalogue/Catalogue'
 
 export function App() {
   const route = useRoute()
@@ -15,7 +15,7 @@ export function App() {
     <div className="app">
       {route.name === 'inventory' && <Inventory />}
       {route.name === 'lot' && <ItemDetail key={route.id} id={route.id} />}
-      {route.name === 'scan' && <ScanSoon />}
+      {route.name === 'scan' && <Catalogue />}
     </div>
   )
 }
