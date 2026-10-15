@@ -1,0 +1,498 @@
+/*
+ * THEME
+ * Colors, type and spacing for the whole app. Values measured from
+ * reference/archive-design.png at a 390px-wide phone.
+ */
+:root {
+  /* Colors */
+  --black: #000000;
+  --bg: #000000;
+  --bg-2: #050809;
+  --panel: #0b1216;          /* card photo area */
+  --panel-2: #121e29;        /* card text area, selected pill, round button */
+  --border: rgba(138, 200, 224, 0.25);
+  --border-strong: rgba(138, 200, 224, 0.5);
+  --ice: #bdf6fc;            /* primary button, active states */
+  --signal: #8ac8e0;         /* citizen numbers, labels, object numbers (as in the reference) */
+  --text: #e6ebec;
+  --heading: #ffffff;
+  --muted: #8e8e93;          /* Last seen, inactive */
+  --line: rgba(255, 255, 255, 0.22); /* crosshair and rings */
+  --glow-ice: 0 0 24px rgba(189, 246, 252, 0.35);
+
+  /* Type. The reference uses Space Grotesk, with Space Mono on the Back pill. */
+  --font-sans: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+
+  /* Spacing */
+  --gutter: clamp(16px, 8.5vw, 36px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --tabbar-h: 72px;
+  --radius-card: 12px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ice);
+  outline-offset: 2px;
+}
+
+/* On a laptop the app sits in a phone-width column. */
+.app {
+  position: relative;
+  max-width: 480px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+/* ---------- Brand (halo logo + name) ---------- */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.brand__name {
+  font-size: 14px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--heading);
+  letter-spacing: 0.01em;
+}
+.halo {
+  display: block;
+  flex: none;
+}
+.halo--spin {
+  animation: halo-spin 6s linear infinite;
+}
+@keyframes halo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .halo--spin {
+    animation-duration: 30s;
+  }
+}
+
+/* ---------- Pills ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px; /* touch target; the visible pill is smaller */
+}
+.pill__face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 34px;
+  padding: 0 15px;
+  border-radius: 999px;
+  border: 1px solid #1c3248;
+  background: var(--black);
+  color: var(--text);
+  font-size: 15px;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+.pill[aria-pressed='true'] .pill__face {
+  background: var(--panel-2);
+  border-color: rgba(138, 200, 224, 0.7);
+}
+.pill--back .pill__face {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  height: 32px;
+  min-width: 84px;
+}
+
+/* ---------- Primary button (ice) ---------- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--ice);
+  color: var(--black);
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: var(--glow-ice);
+}
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* ---------- Inventory ---------- */
+.inventory {
+  padding: calc(var(--safe-top) + 24px) var(--gutter) calc(var(--tabbar-h) + var(--safe-bottom) + 96px);
+}
+.inventory__title {
+  margin: 36px 0 6px;
+  font-size: 27px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.filters {
+  display: flex;
+  gap: 10px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 16px;
+  row-gap: 14px;
+  margin-top: 24px;
+}
+
+/* ---------- Lot card ---------- */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  aspect-ratio: 147 / 191;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  overflow: hidden;
+  isolation: isolate;
+}
+.card:active {
+  border-color: var(--border-strong);
+}
+.card__photo {
+  position: relative;
+  flex: 0 0 63%;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0a1319 0%, #0c161d 100%);
+}
+.card__photo .lot-img {
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  width: 82%;
+  height: 100%;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: center bottom;
+}
+.card__info {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 10px;
+  background: var(--panel-2);
+  border-top: 1px solid rgba(138, 200, 224, 0.35);
+}
+/* The soft light that sits on the divider in the reference. */
+.card__info::before {
+  content: '';
+  position: absolute;
+  inset: -40% 0 0;
+  background: radial-gradient(ellipse 38% 55% at 58% 40%, rgba(214, 236, 245, 0.2), transparent 70%);
+  pointer-events: none;
+}
+.card__obj {
+  font-size: 10px;
+  color: var(--signal);
+}
+.card__name {
+  font-size: 16.5px;
+  line-height: 1.15;
+  color: var(--heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.card__seen {
+  margin-top: 4px;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+/* ---------- Catalogue button (floats above the tab bar) ---------- */
+.catalogue-fab {
+  position: fixed;
+  z-index: 20;
+  left: 50%;
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + 16px);
+  transform: translateX(-50%);
+}
+.catalogue-fab:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+/* ---------- Tab bar ---------- */
+.tabbar {
+  position: fixed;
+  z-index: 10;
+  left: 50%;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
+  transform: translateX(-50%);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 34px 8px calc(var(--safe-bottom) + 6px);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.92) 42%, #000 100%);
+  pointer-events: none;
+}
+.tab {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 52px;
+  color: var(--signal);
+  font-size: 12px;
+}
+.tab svg {
+  width: 30px;
+  height: 30px;
+}
+.tab[aria-current='page'] {
+  color: var(--ice);
+}
+.tab[aria-disabled='true'] {
+  cursor: default;
+}
+
+/* ---------- Item detail ---------- */
+.detail {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 24px) var(--gutter) calc(var(--safe-bottom) + 48px);
+}
+.vline {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+.detail > :not(.vline) {
+  position: relative;
+  z-index: 1;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.detail__title {
+  margin: 30px 0 4px;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  overflow-wrap: anywhere;
+}
+.detail__label {
+  font-size: 15px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: var(--text);
+}
+.detail__citizen {
+  font-size: 15px;
+  line-height: 1.15;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+.detail__bottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.detail__obj {
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--signal);
+}
+.detail__desc {
+  margin: 14px 0 0;
+  max-width: 205px;
+  font-size: 14.5px;
+  line-height: 1.25;
+  color: var(--text);
+}
+.round-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--panel-2);
+  border: 1px solid var(--border-strong);
+  color: var(--heading);
+}
+.round-btn:active {
+  background: #1a2b38;
+}
+
+/* ---------- Composition: crosshair + two rings + object ---------- */
+.composition {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+  margin: 0 calc(var(--gutter) * -1);
+  display: grid;
+  place-items: center;
+}
+.composition__hline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--line);
+}
+.composition__ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  transform: translate(-50%, -50%);
+}
+.composition__ring--outer {
+  width: 79%;
+}
+.composition__ring--inner {
+  width: 58%;
+}
+.composition__object {
+  position: relative;
+  width: 80%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+.composition__object .lot-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.6));
+}
+
+/* ---------- Missing photo ---------- */
+.lot-img--missing {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* ---------- Simple message screens ---------- */
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  min-height: 100dvh;
+  padding: calc(var(--safe-top) + 14px) var(--gutter) calc(var(--safe-bottom) + 40px);
+}
+.message__body {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.message h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--heading);
+}
+.message p {
+  margin: 0;
+  color: var(--text);
+  max-width: 300px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
