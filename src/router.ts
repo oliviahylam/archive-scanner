@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 
 /**
- * Tiny hash-based router: #/ , #/lot/<id> , #/scan, and #/home , #/choices , #/day for the day.
+ * Tiny hash-based router. The app opens on Home (#/home, also #/). The scanner lives at
+ * #/inventory , #/lot/<id> , #/scan. #/start clears the visitor's day and opens the welcome screen.
  * Hash links work on any static host and when the app is added to the home screen.
  */
 export type Route =
@@ -12,6 +13,7 @@ export type Route =
   | { name: 'home' }
   | { name: 'choices' }
   | { name: 'day' }
+  | { name: 'start' }
 
 function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
@@ -21,11 +23,13 @@ function parse(hash: string): Route {
   if (parts[0] === 'home') return { name: 'home' }
   if (parts[0] === 'choices') return { name: 'choices' }
   if (parts[0] === 'day') return { name: 'day' }
-  return { name: 'inventory' }
+  if (parts[0] === 'inventory') return { name: 'inventory' }
+  if (parts[0] === 'start') return { name: 'start' }
+  return { name: 'home' }
 }
 
 export const href = {
-  inventory: () => '#/',
+  inventory: () => '#/inventory',
   lot: (id: string) => `#/lot/${encodeURIComponent(id)}`,
   scan: () => '#/scan',
   home: () => '#/home',

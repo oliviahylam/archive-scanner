@@ -7,8 +7,9 @@ recovered from a randomly generated citizen.
 Design reference: `reference/archive-design.png`.
 
 The Home and Choices tabs hold the rest of the app from the Figma wireframes: a welcome screen
-(first visit only), today at a glance, the evening choice and the finished day. Open `#/status`
-and choose **Start the day again** to see the welcome screen again.
+(first visit only), today at a glance, the evening choice and the finished day. The app opens on Home;
+the scanner is under Inventory (`#/inventory`). Open `#/start` to clear your answers and see the
+welcome screen again.
 
 ## Where things are
 

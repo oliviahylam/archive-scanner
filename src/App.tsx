@@ -1,5 +1,6 @@
-import { useLayoutEffect } from 'react'
-import { useRoute } from './router'
+import { useEffect, useLayoutEffect } from 'react'
+import { resetDay } from './day'
+import { href, navigate, useRoute } from './router'
 import { Inventory } from './screens/Inventory'
 import { ItemDetail } from './screens/ItemDetail'
 import { Catalogue } from './screens/catalogue/Catalogue'
@@ -24,6 +25,16 @@ export function App() {
       {route.name === 'home' && <Home />}
       {route.name === 'choices' && <Choices />}
       {route.name === 'day' && <Day />}
+      {route.name === 'start' && <Start />}
     </div>
   )
+}
+
+/** #/start: forget the visitor's answers and open the welcome screen, for showing the prototype again. */
+function Start() {
+  useEffect(() => {
+    resetDay()
+    navigate(href.home(), { replace: true })
+  }, [])
+  return null
 }
