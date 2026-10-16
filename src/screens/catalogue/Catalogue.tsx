@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { fitForUpload, makeCutout } from '../../cutout'
 import { addLot, type Draft } from '../../db'
 import { href, navigate } from '../../router'
+import { showActiveTab } from '../Inventory'
 import type { Lot } from '../../types'
 import { Confirmation } from './Confirmation'
 import { NameObject } from './NameObject'
@@ -31,6 +32,7 @@ export function Catalogue() {
   const onSubmit = async (draft: Draft) => {
     if (step.name !== 'naming') return
     const lot = await addLot(draft, await fitForUpload(step.cutout))
+    showActiveTab()
     setStep({ name: 'done', lot })
   }
 

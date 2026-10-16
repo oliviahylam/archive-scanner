@@ -123,6 +123,7 @@ export async function addLot(draft: Draft, image: Blob): Promise<Lot> {
     images: [image],
     createdAt: new Date().toISOString(),
     inherited: false,
+    status: 'active',
   }
   await set(LOCAL_LOTS, [...(await localLots()), lot], store)
   lastList = [lot, ...(lastList ?? [])]

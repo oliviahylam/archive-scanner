@@ -8,11 +8,18 @@ import { listLots } from '../db'
 import { href } from '../router'
 import type { Lot } from '../types'
 
-const FILTERS = ['For you', 'Taste', 'Contact'] as const
+/** Active: lots of living citizens (every new scan). Archive: owners who are Last Seen. */
+const FILTERS = ['Active', 'Archive'] as const
 
 // Remember where the visitor was in the grid when they open a lot and come back.
 let savedScroll = 0
-let savedFilter: (typeof FILTERS)[number] = 'For you'
+let savedFilter: (typeof FILTERS)[number] = 'Active'
+
+/** After a scan, the Inventory opens on Active, where the new lot is. */
+export function showActiveTab() {
+  savedFilter = 'Active'
+  savedScroll = 0
+}
 
 export function Inventory() {
   const [lots, setLots] = useState<Lot[] | null>(null)
@@ -52,6 +59,8 @@ export function Inventory() {
     setFilter(f)
   }
 
+  const shown = lots?.filter((l) => (l.status === 'archive' ? 'Archive' : 'Active') === filter)
+
   return (
     <main className="inventory">
       <Brand />
@@ -67,8 +76,15 @@ export function Inventory() {
       {error && <p>The Archive could not be opened on this device. Please reload the page.</p>}
 
       <div className="grid" aria-busy={lots === null}>
-        {lots?.map((lot, i) => <LotCard key={lot.id} lot={lot} eager={i < 4} />)}
+        {shown?.map((lot, i) => <LotCard key={lot.id} lot={lot} eager={i < 4} />)}
       </div>
+      {shown?.length === 0 && (
+        <p className="inventory__empty">
+          {filter === 'Active'
+            ? 'No active lots yet. Catalogue an object to add the first.'
+            : 'No lots in the Archive.'}
+        </p>
+      )}
 
       <a className="btn-primary catalogue-fab" href={href.scan()}>
         <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">

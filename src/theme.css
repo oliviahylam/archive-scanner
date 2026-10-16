@@ -803,3 +803,10 @@ img {
     opacity: 0;
   }
 }
+
+.inventory__empty {
+  margin: 8px 0 0;
+  max-width: 260px;
+  font-size: 14px;
+  color: var(--muted);
+}

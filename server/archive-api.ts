@@ -104,6 +104,7 @@ export async function handleAdd(request: Request, store: ArchiveStore): Promise<
     images: [imageUrl],
     createdAt: new Date().toISOString(),
     inherited: false,
+    status: 'active',
   }
   await store.saveLot(lot)
   return json(lot, 201)

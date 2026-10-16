@@ -22,6 +22,7 @@ const seed = (
   images: [`/lots/obj-${objNumber}.png`],
   createdAt: '2045-11-03T00:00:00.000Z',
   inherited: false,
+  status: 'archive',
   seed: true,
 })
 

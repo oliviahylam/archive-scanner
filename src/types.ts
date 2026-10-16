@@ -17,6 +17,11 @@ export interface Lot {
   /** ISO timestamp. */
   createdAt: string
   inherited: boolean
+  /**
+   * Active: belongs to a living citizen (everything visitors scan).
+   * Archive: its owner is Last Seen. Missing means active.
+   */
+  status?: 'active' | 'archive'
   /** Seed lots are part of the exhibit and survive a Reset Archive. */
   seed?: boolean
 }
