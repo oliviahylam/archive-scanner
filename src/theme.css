@@ -910,6 +910,7 @@ img {
 .today__head h1,
 .welcome__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 26px;
   font-weight: 400;
   line-height: 1.15;
@@ -1032,6 +1033,7 @@ img {
 }
 .sheet h2 {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 22px;
   font-weight: 400;
   text-transform: uppercase;
@@ -1105,6 +1107,7 @@ img {
   background: var(--black);
 }
 .dial__count {
+  font-family: var(--font-display);
   font-size: 36px;
   line-height: 1;
   color: var(--heading);
