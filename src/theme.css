@@ -1,26 +1,30 @@
 /*
  * THEME
- * Colors, type and spacing for the whole app. Values measured from
- * reference/archive-design.png at a 390px-wide phone.
+ * Colors, type and spacing for the whole app. Palette and typefaces from the
+ * Terms of Living brand sheet in Figma; sizes from its Inventory wireframes.
  */
 :root {
   /* Colors */
   --black: #000000;
   --bg: #000000;
   --bg-2: #050809;
-  --panel: #0b1216;          /* card photo area */
-  --panel-2: #121e29;        /* card text area, selected pill, round button */
-  --border: rgba(138, 200, 224, 0.25);
-  --border-strong: rgba(138, 200, 224, 0.5);
-  --ice: #bdf6fc;            /* primary button, active states */
-  --signal: #8ac8e0;         /* citizen numbers, labels, object numbers (as in the reference) */
-  --text: #e6ebec;
+  --deep: #155b83;           /* brand deep blue: pill and card borders */
+  --tint: rgba(21, 91, 131, 0.2); /* deep blue at 20%: card fills */
+  --panel: #04121a;          /* card photo area (the tint on black) */
+  --panel-2: #09202d;        /* card text area, selected pill, round button */
+  --border: var(--deep);
+  --border-strong: var(--signal);
+  --ice: #a5fff6;            /* brand mint: checkboxes, shutter, focus */
+  --ice-fill: rgba(165, 255, 246, 0.23); /* primary button */
+  --signal: #75cdeb;         /* citizen numbers, labels, object numbers */
+  --text: #e4ebee;
   --heading: #ffffff;
-  --muted: #8e8e93;          /* Last seen, inactive */
+  --muted: #8e8e93;          /* inactive */
   --line: rgba(255, 255, 255, 0.22); /* crosshair and rings */
-  --glow-ice: 0 0 24px rgba(189, 246, 252, 0.35);
+  --glow-ice: 0 0 24px rgba(165, 255, 246, 0.25);
 
-  /* Type. The reference uses Space Grotesk, with Space Mono on the Back pill. */
+  /* Type. Questrial for titles, the name and buttons; Space Grotesk (Light and Medium) for the rest. */
+  --font-display: 'Questrial', 'Space Grotesk Variable', system-ui, sans-serif;
   --font-sans: 'Space Grotesk Variable', 'Space Grotesk', system-ui, sans-serif;
   --font-mono: 'Space Mono', ui-monospace, monospace;
 
@@ -29,7 +33,7 @@
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --tabbar-h: 72px;
-  --radius-card: 12px;
+  --radius-card: 10px;
 }
 
 *,
@@ -102,7 +106,8 @@ img {
   -webkit-touch-callout: none;
 }
 .brand__name {
-  font-size: 14px;
+  font-family: var(--font-display);
+  font-size: 16.9px;
   line-height: 1;
   text-transform: uppercase;
   color: var(--heading);
@@ -136,25 +141,23 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 34px;
-  padding: 0 15px;
+  height: 35px;
+  padding: 0 18px;
   border-radius: 999px;
-  border: 1px solid #1c3248;
+  border: 1px solid var(--deep);
   background: var(--black);
-  color: var(--text);
-  font-size: 15px;
+  color: var(--heading);
+  font-size: 16px;
   white-space: nowrap;
   transition: background 0.2s, border-color 0.2s;
 }
 .pill[aria-pressed='true'] .pill__face {
   background: var(--panel-2);
-  border-color: rgba(138, 200, 224, 0.7);
+  border-color: var(--signal);
 }
 .pill--back .pill__face {
-  font-family: var(--font-mono);
-  font-size: 14px;
   height: 32px;
-  min-width: 84px;
+  min-width: 87px;
 }
 
 /* ---------- Primary button (ice) ---------- */
@@ -163,15 +166,17 @@ img {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 52px;
-  padding: 0 24px;
+  min-height: 55px;
+  padding: 0 28px;
   border-radius: 999px;
-  background: var(--ice);
-  color: var(--black);
-  font-size: 15px;
-  font-weight: 500;
+  background: var(--ice-fill);
+  color: var(--heading);
+  font-family: var(--font-display);
+  font-size: 21px;
   white-space: nowrap;
-  box-shadow: var(--glow-ice);
+  box-shadow: inset 0 0 0 1px rgba(165, 255, 246, 0.3);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 .btn-primary:active {
   transform: scale(0.98);
@@ -183,7 +188,8 @@ img {
 }
 .inventory__title {
   margin: 36px 0 6px;
-  font-size: 27px;
+  font-family: var(--font-display);
+  font-size: 26px;
   font-weight: 400;
   line-height: 1;
   color: var(--heading);
@@ -207,21 +213,21 @@ img {
   position: relative;
   display: flex;
   flex-direction: column;
-  aspect-ratio: 147 / 191;
+  aspect-ratio: 154 / 201;
   border-radius: var(--radius-card);
-  border: 1px solid var(--border);
+  border: 0.5px solid var(--heading);
   background: var(--panel);
   overflow: hidden;
   isolation: isolate;
 }
 .card:active {
-  border-color: var(--border-strong);
+  border-color: var(--signal);
 }
 .card__photo {
   position: relative;
   flex: 0 0 63%;
   overflow: hidden;
-  background: linear-gradient(180deg, #0a1319 0%, #0c161d 100%);
+  background: linear-gradient(180deg, #03111a 0%, #05192a 100%);
 }
 .card__photo .lot-img {
   position: absolute;
@@ -242,7 +248,7 @@ img {
   gap: 2px;
   padding: 0 10px;
   background: var(--panel-2);
-  border-top: 1px solid rgba(138, 200, 224, 0.35);
+  border-top: 1px solid var(--deep);
 }
 /* The soft light that sits on the divider in the reference. */
 .card__info::before {
@@ -254,10 +260,11 @@ img {
 }
 .card__obj {
   font-size: 10px;
+  font-weight: 500;
   color: var(--signal);
 }
 .card__name {
-  font-size: 16.5px;
+  font-size: 16px;
   line-height: 1.15;
   color: var(--heading);
   overflow: hidden;
@@ -267,7 +274,7 @@ img {
 .card__seen {
   margin-top: 4px;
   font-size: 9px;
-  color: var(--muted);
+  color: var(--signal);
 }
 
 /* ---------- Catalogue button (floats above the tab bar) ---------- */
@@ -306,7 +313,7 @@ img {
   gap: 4px;
   min-height: 52px;
   color: var(--signal);
-  font-size: 12px;
+  font-size: 13px;
 }
 .tab svg {
   width: 30px;
@@ -348,7 +355,8 @@ img {
 }
 .detail__title {
   margin: 30px 0 4px;
-  font-size: 34px;
+  font-family: var(--font-display);
+  font-size: 36px;
   font-weight: 400;
   line-height: 1;
   color: var(--heading);
@@ -357,14 +365,16 @@ img {
   overflow-wrap: anywhere;
 }
 .detail__label {
-  font-size: 15px;
-  line-height: 1.15;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.1;
   text-transform: uppercase;
   color: var(--text);
 }
 .detail__citizen {
-  font-size: 15px;
-  line-height: 1.15;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1.1;
   text-transform: uppercase;
   color: var(--signal);
 }
@@ -375,31 +385,32 @@ img {
   gap: 16px;
 }
 .detail__obj {
-  font-size: 34px;
-  font-weight: 400;
+  font-size: 32px;
+  font-weight: 500;
   line-height: 1;
   color: var(--signal);
 }
 .detail__desc {
   margin: 14px 0 0;
-  max-width: 205px;
-  font-size: 14.5px;
-  line-height: 1.25;
+  max-width: 233px;
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 18px;
   color: var(--text);
 }
 .round-btn {
   flex: none;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 67px;
+  height: 67px;
   border-radius: 50%;
   background: var(--panel-2);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--signal);
   color: var(--heading);
 }
 .round-btn:active {
-  background: #1a2b38;
+  background: #0e2c3e;
 }
 
 /* ---------- Composition: crosshair + two rings + object ---------- */
@@ -476,6 +487,7 @@ img {
   gap: 12px;
 }
 .message h1 {
+  font-family: var(--font-display);
   margin: 0;
   font-size: 26px;
   font-weight: 400;
@@ -505,7 +517,7 @@ img {
   color: var(--ice);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: rgba(189, 246, 252, 0.4);
+  text-decoration-color: rgba(165, 255, 246, 0.4);
 }
 .text-btn:disabled {
   opacity: 0.4;
@@ -577,6 +589,7 @@ img {
   background: rgba(11, 18, 22, 0.92);
 }
 .scan__message h1 {
+  font-family: var(--font-display);
   margin: 0;
   font-size: 20px;
   font-weight: 400;
@@ -637,6 +650,7 @@ img {
   text-align: center;
 }
 .processing__text h1 {
+  font-family: var(--font-display);
   margin: 0 0 8px;
   font-size: 22px;
   font-weight: 400;
@@ -726,7 +740,7 @@ img {
   color: #5d6266;
 }
 .field__input:focus {
-  border-color: rgba(189, 246, 252, 0.7);
+  border-color: rgba(165, 255, 246, 0.7);
 }
 .field__input[aria-invalid='true'] {
   border-color: var(--signal);
@@ -759,7 +773,7 @@ img {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 0;
-  border-top: 1px solid rgba(138, 200, 224, 0.12);
+  border-top: 1px solid rgba(117, 205, 235, 0.12);
 }
 .record__list dt {
   font-size: 13px;
@@ -788,6 +802,7 @@ img {
   animation: fade-in 0.5s ease-out;
 }
 .confirm h1 {
+  font-family: var(--font-display);
   margin: 0;
   font-size: 22px;
   font-weight: 400;
@@ -795,7 +810,9 @@ img {
 }
 .confirm__obj {
   margin: 0;
-  font-size: 34px;
+  font-family: var(--font-sans);
+  font-size: 32px;
+  font-weight: 500;
   color: var(--signal);
 }
 @keyframes fade-in {
@@ -822,6 +839,7 @@ img {
   padding: calc(var(--safe-top) + 24px) var(--gutter) calc(var(--safe-bottom) + 32px);
 }
 .status h1 {
+  font-family: var(--font-display);
   margin: 24px 0 12px;
   font-size: 26px;
   font-weight: 400;
@@ -856,7 +874,7 @@ img {
 }
 .status__log li {
   padding: 4px 0;
-  border-top: 1px solid rgba(138, 200, 224, 0.12);
+  border-top: 1px solid rgba(117, 205, 235, 0.12);
   overflow-wrap: anywhere;
 }
 .status__log time {
