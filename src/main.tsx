@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { registerSW } from 'virtual:pwa-register'
 import '@fontsource-variable/space-grotesk'
 import '@fontsource/space-mono/400.css'
 import './theme.css'
@@ -10,3 +11,7 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 )
+
+// Offline support. When a new version is published, switch to it straight away
+// (the page reloads once), so phones never get stuck on an old copy.
+registerSW({ immediate: true })
