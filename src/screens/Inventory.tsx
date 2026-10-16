@@ -93,7 +93,7 @@ export function Inventory() {
         Catalogue an object
       </a>
 
-      <TabBar />
+      <TabBar active="inventory" />
     </main>
   )
 }

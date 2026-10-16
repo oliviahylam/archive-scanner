@@ -6,6 +6,10 @@ recovered from a randomly generated citizen.
 
 Design reference: `reference/archive-design.png`.
 
+The Home and Choices tabs hold the rest of the app from the Figma wireframes: a welcome screen
+(first visit only), today at a glance, the evening choice and the finished day. Open `#/status`
+and choose **Start the day again** to see the welcome screen again.
+
 ## Where things are
 
 | You want to…                                        | Edit this                         |
@@ -14,6 +18,7 @@ Design reference: `reference/archive-design.png`.
 | Change the 6 seed lots (names, citizens, text)      | `src/seed.ts`                     |
 | Replace the seed photos                             | `public/lots/` (see below)        |
 | Change colors, fonts, sizes                         | `src/theme.css` (top of the file) |
+| Change Home, Choices and the day schedule text     | `src/day.ts`                      |
 
 ### Seed photos
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Pill } from '../components/Pill'
+import { resetDay } from '../day'
 import { clearLog, readLog } from '../log'
 import { goBack } from '../router'
 
@@ -49,6 +50,9 @@ export function Status() {
           </div>
         ))}
       </dl>
+      <button type="button" className="text-btn" onClick={resetDay}>
+        Start the day again from the welcome screen
+      </button>
       <div className="status__head">
         <h2>Recent steps</h2>
         <button type="button" className="text-btn" onClick={() => (clearLog(), setEntries([]))}>

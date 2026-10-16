@@ -23,25 +23,24 @@ const PermitIcon = () => (
   </svg>
 )
 
-/**
- * Home, Choices and Permit belong to the wider Terms of Living world
- * and aren't part of the Scanner, so only Inventory is active.
- */
-export function TabBar() {
+export type Tab = 'home' | 'choices' | 'inventory'
+
+const TABS = [
+  { id: 'home', label: 'Home', to: href.home(), icon: <HaloLogo size={30} /> },
+  { id: 'choices', label: 'Choices', to: href.choices(), icon: <ChoicesIcon /> },
+  { id: 'inventory', label: 'Inventory', to: href.inventory(), icon: <InventoryIcon /> },
+] as const
+
+/** Permit belongs to the wider Terms of Living world and isn't built yet. */
+export function TabBar({ active }: { active: Tab }) {
   return (
     <nav className="tabbar" aria-label="Main">
-      <span className="tab" aria-disabled="true">
-        <HaloLogo size={30} />
-        Home
-      </span>
-      <span className="tab" aria-disabled="true">
-        <ChoicesIcon />
-        Choices
-      </span>
-      <a className="tab" href={href.inventory()} aria-current="page">
-        <InventoryIcon />
-        Inventory
-      </a>
+      {TABS.map((t) => (
+        <a key={t.id} className="tab" href={t.to} aria-current={active === t.id ? 'page' : undefined}>
+          {t.icon}
+          {t.label}
+        </a>
+      ))}
       <span className="tab" aria-disabled="true">
         <PermitIcon />
         Permit

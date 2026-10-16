@@ -4,6 +4,9 @@ import { Inventory } from './screens/Inventory'
 import { ItemDetail } from './screens/ItemDetail'
 import { Catalogue } from './screens/catalogue/Catalogue'
 import { Status } from './screens/Status'
+import { Home } from './screens/day/Home'
+import { Choices } from './screens/day/Choices'
+import { Day } from './screens/day/Day'
 
 export function App() {
   const route = useRoute()
@@ -18,6 +21,9 @@ export function App() {
       {route.name === 'lot' && <ItemDetail key={route.id} id={route.id} />}
       {route.name === 'scan' && <Catalogue />}
       {route.name === 'status' && <Status />}
+      {route.name === 'home' && <Home />}
+      {route.name === 'choices' && <Choices />}
+      {route.name === 'day' && <Day />}
     </div>
   )
 }
