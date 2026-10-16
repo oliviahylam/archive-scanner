@@ -108,7 +108,10 @@ export async function addLot(draft: Draft, image: Blob): Promise<Lot> {
       lastList = [lot, ...(lastList ?? [])]
       return lot
     }
-    if (res.status !== 503 && res.status !== 404) throw new Error(`Could not add the lot (${res.status})`)
+    if (res.status !== 503 && res.status !== 404) {
+      const body = await res.json().catch(() => ({}))
+      throw new Error(`${res.status} ${body.error ?? ''}`.trim())
+    }
     mode = 'local'
   }
 

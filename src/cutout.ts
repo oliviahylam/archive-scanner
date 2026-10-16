@@ -13,11 +13,15 @@ const config = (progress?: (fraction: number) => void): Config => ({
   progress: progress
     ? (key, current, total) => {
         if (key === 'fetch:/models/small' && total > 0) progress(current / total)
+        else if (key.startsWith('compute')) progress(COMPUTING)
+        else progress(-1) // other downloads: keeps the timer alive, not shown
       }
     : undefined,
 })
 
 const lib = () => import('@imgly/background-removal')
+/** Progress value meaning "the cut-out itself is running" (it reports no steps). */
+const COMPUTING = -2
 
 /** Start downloading the model in the background so the first scan is quick. */
 let preloading = false
@@ -43,7 +47,26 @@ export interface CutoutResult {
 export async function makeCutout(photo: Blob, onProgress?: (fraction: number) => void): Promise<CutoutResult> {
   try {
     const { removeBackground } = await lib()
-    const png = await removeBackground(photo, config(onProgress))
+    // Never wait forever: give up if nothing happens for 45 seconds (e.g. the model
+    // download stalls on poor wifi), or after 3 minutes in total, and keep the photo.
+    const png = await new Promise<Blob>((resolve, reject) => {
+      const fail = () => reject(new Error('Background removal timed out'))
+      const total = setTimeout(fail, 180_000)
+      let idle = setTimeout(fail, 45_000)
+      const progress = (fraction: number) => {
+        clearTimeout(idle)
+        // The cut-out reports no steps, so only the 3-minute limit applies while it runs.
+        if (fraction !== COMPUTING) idle = setTimeout(fail, 45_000)
+        if (fraction >= 0) onProgress?.(fraction)
+      }
+      const done = () => {
+        clearTimeout(total)
+        clearTimeout(idle)
+      }
+      removeBackground(photo, config(progress))
+        .then((b) => (done(), resolve(b)))
+        .catch((e) => (done(), reject(e)))
+    })
     const trimmed = await trimTransparent(png)
     if (trimmed) return { image: trimmed, removed: true }
   } catch (err) {

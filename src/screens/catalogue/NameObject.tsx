@@ -43,7 +43,7 @@ export function NameObject({
   const [generated, setGenerated] = useState<Generated | null>(null)
   const [showNameHint, setShowNameHint] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [saveError, setSaveError] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   useEffect(() => {
     generate().then(setGenerated)
@@ -58,11 +58,11 @@ export function NameObject({
     }
     if (!generated || saving) return
     setSaving(true)
-    setSaveError(false)
+    setSaveError(null)
     try {
       await onSubmit({ ...generated, name: name.trim(), description: description.trim() })
-    } catch {
-      setSaveError(true)
+    } catch (err) {
+      setSaveError(err instanceof Error && err.name !== 'AbortError' ? err.message : 'timeout')
       setSaving(false)
     }
   }
@@ -162,6 +162,7 @@ export function NameObject({
         {saveError && (
           <p className="field__hint" role="alert">
             The Archive could not be reached. Please check the connection and try again.
+            <span className="field__code"> Code: {saveError}</span>
           </p>
         )}
         <button type="submit" className="btn-primary btn-primary--block" disabled={saving || !generated}>
