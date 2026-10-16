@@ -13,7 +13,7 @@ export function HaloLogo({ size = 36, spin = false }: { size?: number; spin?: bo
     >
       <defs>
         <linearGradient id={`${id}g`} x1="0.15" y1="0.05" x2="0.8" y2="0.95">
-          <stop offset="0" stopColor="#BDF6FC" stopOpacity="0.95" />
+          <stop offset="0" stopColor="#A5FFF6" stopOpacity="0.95" />
           <stop offset="0.45" stopColor="#5f8f99" stopOpacity="0.55" />
           <stop offset="1" stopColor="#0b1216" stopOpacity="0.9" />
         </linearGradient>
