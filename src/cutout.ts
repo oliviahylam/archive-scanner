@@ -251,3 +251,16 @@ export async function squarePhoto(file: Blob): Promise<Blob> {
   ctx.drawImage(img, (img.naturalWidth - src) / 2, (img.naturalHeight - src) / 2, src, src, 0, 0, side, side)
   return toBlob(c, 'image/jpeg', 0.92)
 }
+
+/** Keep uploads comfortably under the server's 4 MB limit. */
+export async function fitForUpload(image: Blob, maxBytes = 3.5 * 1024 * 1024): Promise<Blob> {
+  let out = image
+  for (let side = 900; out.size > maxBytes && side >= 300; side -= 200) {
+    const img = await loadImage(image)
+    const scale = side / Math.max(img.naturalWidth, img.naturalHeight)
+    const { c, ctx } = canvas2d(img.naturalWidth * scale, img.naturalHeight * scale)
+    ctx.drawImage(img, 0, 0, c.width, c.height)
+    out = await toBlob(c)
+  }
+  return out
+}

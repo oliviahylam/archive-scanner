@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import basicSsl from '@vitejs/plugin-basic-ssl'
 import { VitePWA } from 'vite-plugin-pwa'
+import { devArchiveApi } from './server/dev-plugin'
 
 // `npm run phone` starts the dev server with a local HTTPS certificate,
 // because phone browsers only allow the camera on secure (https) pages.
@@ -11,6 +12,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     mode === 'phone' && basicSsl(),
+    devArchiveApi(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png', 'lots/*'],
@@ -34,7 +36,17 @@ export default defineConfig(({ mode }) => ({
         // up front. It's kept on the phone the first time it's used (below).
         globIgnores: ['cutout/**'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.hostname.endsWith('.blob.vercel-storage.com'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'lot-photos',
+              expiration: { maxEntries: 500 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/cutout/'),
             handler: 'CacheFirst',

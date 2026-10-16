@@ -10,16 +10,8 @@ import {
 } from '../../archive-rules'
 import { Brand } from '../../components/Brand'
 import { Pill } from '../../components/Pill'
-import { takenNumbers } from '../../db'
+import { takenNumbers, type Draft } from '../../db'
 import { useObjectUrl } from '../../hooks/useObjectUrl'
-
-export interface Draft {
-  name: string
-  objNumber: string
-  citizenNumber: string
-  lastSeen: string
-  description: string
-}
 
 type Generated = Pick<Draft, 'objNumber' | 'citizenNumber' | 'lastSeen'>
 
@@ -169,7 +161,7 @@ export function NameObject({
 
         {saveError && (
           <p className="field__hint" role="alert">
-            The lot could not be saved on this device. Please try again.
+            The Archive could not be reached. Please check the connection and try again.
           </p>
         )}
         <button type="submit" className="btn-primary btn-primary--block" disabled={saving || !generated}>

@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { generateObjNumber, generateCitizenNumber } from '../../archive-rules'
-import { makeCutout } from '../../cutout'
-import { addLot, takenNumbers } from '../../db'
+import { fitForUpload, makeCutout } from '../../cutout'
+import { addLot, type Draft } from '../../db'
 import { href, navigate } from '../../router'
 import type { Lot } from '../../types'
 import { Confirmation } from './Confirmation'
-import { NameObject, type Draft } from './NameObject'
+import { NameObject } from './NameObject'
 import { Processing } from './Processing'
 import { ScanCamera } from './ScanCamera'
 
@@ -14,9 +13,6 @@ type Step =
   | { name: 'processing' }
   | { name: 'naming'; cutout: Blob; removed: boolean }
   | { name: 'done'; lot: Lot }
-
-const newId = () =>
-  crypto.randomUUID?.() ?? `lot-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
 
 /** Scan → Cataloguing… → Name your object → Lot added → the new lot. */
 export function Catalogue() {
@@ -34,20 +30,7 @@ export function Catalogue() {
 
   const onSubmit = async (draft: Draft) => {
     if (step.name !== 'naming') return
-    // Numbers are checked again at the moment of saving, in case another lot took them.
-    const taken = await takenNumbers()
-    const lot: Lot = {
-      id: newId(),
-      ...draft,
-      objNumber: taken.obj.has(draft.objNumber) ? generateObjNumber(taken.obj) : draft.objNumber,
-      citizenNumber: taken.citizen.has(draft.citizenNumber)
-        ? generateCitizenNumber(taken.citizen)
-        : draft.citizenNumber,
-      images: [step.cutout],
-      createdAt: new Date().toISOString(),
-      inherited: false,
-    }
-    await addLot(lot)
+    const lot = await addLot(draft, await fitForUpload(step.cutout))
     setStep({ name: 'done', lot })
   }
 

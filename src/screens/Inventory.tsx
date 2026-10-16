@@ -20,10 +20,19 @@ export function Inventory() {
   const [filter, setFilter] = useState(savedFilter)
 
   useEffect(() => {
-    listLots().then(setLots, () => setError(true))
+    const refresh = () => listLots().then(setLots, () => setError(true))
+    refresh()
+    // Others may be adding lots: look again every 20 seconds, and on returning to the page.
+    const poll = setInterval(() => !document.hidden && refresh(), 20000)
+    const onVisible = () => !document.hidden && refresh()
+    document.addEventListener('visibilitychange', onVisible)
     // Fetch the background-removal model quietly, so the first scan doesn't wait for it.
     const idle = setTimeout(preloadCutoutModel, 1500)
-    return () => clearTimeout(idle)
+    return () => {
+      clearTimeout(idle)
+      clearInterval(poll)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
   }, [])
 
   useLayoutEffect(() => {
@@ -32,9 +41,11 @@ export function Inventory() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Restore the scroll position once, when the grid first appears.
+  const restored = lots !== null
   useLayoutEffect(() => {
-    if (lots) window.scrollTo(0, savedScroll)
-  }, [lots])
+    if (restored) window.scrollTo(0, savedScroll)
+  }, [restored])
 
   const choose = (f: (typeof FILTERS)[number]) => {
     savedFilter = f
