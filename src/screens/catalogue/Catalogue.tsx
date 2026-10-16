@@ -3,6 +3,7 @@ import { fitForUpload, makeCutout } from '../../cutout'
 import { addLot, type Draft } from '../../db'
 import { href, navigate } from '../../router'
 import { showActiveTab } from '../Inventory'
+import { log } from '../../log'
 import type { Lot } from '../../types'
 import { Confirmation } from './Confirmation'
 import { NameObject } from './NameObject'
@@ -25,13 +26,23 @@ export function Catalogue() {
   const onPhoto = async (photo: Blob) => {
     setStep({ name: 'processing' })
     setDownload(null)
+    log(`photo captured (${Math.round(photo.size / 1024)} KB)`)
     const { image, removed } = await makeCutout(photo, setDownload)
+    log(`cutout ready (${removed ? 'background removed' : 'background kept'}, ${Math.round(image.size / 1024)} KB)`)
     if (alive.current) setStep({ name: 'naming', cutout: image, removed })
   }
 
   const onSubmit = async (draft: Draft) => {
     if (step.name !== 'naming') return
-    const lot = await addLot(draft, await fitForUpload(step.cutout))
+    log(`add tapped: "${draft.name}"`)
+    let lot
+    try {
+      lot = await addLot(draft, await fitForUpload(step.cutout))
+    } catch (err) {
+      log(`add failed: ${err instanceof Error ? err.message : String(err)}`)
+      throw err
+    }
+    log(`added Obj ${lot.objNumber} (${typeof lot.images[0] === 'string' ? 'shared' : 'this phone only'}, ${lot.status})`)
     showActiveTab()
     setStep({ name: 'done', lot })
   }

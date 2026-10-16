@@ -8,11 +8,13 @@ export type Route =
   | { name: 'inventory' }
   | { name: 'lot'; id: string }
   | { name: 'scan' }
+  | { name: 'status' }
 
 function parse(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean)
   if (parts[0] === 'lot' && parts[1]) return { name: 'lot', id: decodeURIComponent(parts[1]) }
   if (parts[0] === 'scan') return { name: 'scan' }
+  if (parts[0] === 'status') return { name: 'status' }
   return { name: 'inventory' }
 }
 

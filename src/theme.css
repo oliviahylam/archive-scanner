@@ -816,3 +816,49 @@ img {
   font-family: var(--font-mono);
   font-size: 11px;
 }
+
+/* ---------- Status page (#/status) ---------- */
+.status {
+  padding: calc(var(--safe-top) + 24px) var(--gutter) calc(var(--safe-bottom) + 32px);
+}
+.status h1 {
+  margin: 24px 0 12px;
+  font-size: 26px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--heading);
+}
+.status h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  color: var(--signal);
+}
+.status dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.status__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.status__log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--text);
+}
+.status__log li {
+  padding: 4px 0;
+  border-top: 1px solid rgba(138, 200, 224, 0.12);
+  overflow-wrap: anywhere;
+}
+.status__log time {
+  color: var(--muted);
+}

@@ -1,5 +1,6 @@
 import { createStore, get, set } from 'idb-keyval'
 import { generateCitizenNumber, generateObjNumber } from './archive-rules'
+import { log } from './log'
 import { SEED_LOTS } from './seed'
 import type { Lot } from './types'
 
@@ -68,7 +69,8 @@ export async function listLots(): Promise<Lot[]> {
       mode = 'local'
       visitors = await localLots()
     }
-  } catch {
+  } catch (err) {
+    log(`list failed: ${err instanceof Error ? err.message : String(err)}`)
     // Offline or the server is busy: show the last copy we have.
     visitors = mode === 'local' ? await localLots() : ((await get<Lot[]>(SHARED_CACHE, store)) ?? [])
   }

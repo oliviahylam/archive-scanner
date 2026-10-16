@@ -9,6 +9,10 @@ import { devArchiveApi } from './server/dev-plugin'
 export default defineConfig(({ mode }) => ({
   // The background-removal engine is loaded only when someone scans, so its size is fine.
   build: { chunkSizeWarningLimit: 1500 },
+  // Shown on the status page (#/status), so we can tell which version a phone runs.
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'local'),
+  },
   plugins: [
     react(),
     mode === 'phone' && basicSsl(),

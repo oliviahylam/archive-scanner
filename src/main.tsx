@@ -5,6 +5,9 @@ import '@fontsource-variable/space-grotesk'
 import '@fontsource/space-mono/400.css'
 import './theme.css'
 import { App } from './App'
+import { startLogging } from './log'
+
+startLogging()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
