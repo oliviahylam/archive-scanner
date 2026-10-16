@@ -9,13 +9,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const src = join(root, 'node_modules/@imgly/background-removal-data/dist')
 const out = join(root, 'public/cutout')
 
-const KEEP = [
-  '/models/small',
-  '/onnxruntime-web/ort-wasm.wasm',
-  '/onnxruntime-web/ort-wasm-simd.wasm',
-  '/onnxruntime-web/ort-wasm-threaded.wasm',
-  '/onnxruntime-web/ort-wasm-simd-threaded.wasm',
-]
+// The model, plus the two engine builds used without cross-origin isolation:
+// SIMD (every current phone) and plain (older devices).
+const KEEP = ['/models/small', '/onnxruntime-web/ort-wasm-simd.wasm', '/onnxruntime-web/ort-wasm.wasm']
 
 const all = JSON.parse(readFileSync(join(src, 'resources.json'), 'utf8'))
 const resources = Object.fromEntries(KEEP.map((k) => [k, all[k]]))

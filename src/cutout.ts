@@ -1,40 +1,116 @@
 import type { Config } from '@imgly/background-removal'
+import { log } from './log'
 
 /**
  * Background removal, on the phone, with @imgly/background-removal.
- * The model (~44 MB) is served by this app from /cutout/ (copied there by
- * scripts/copy-cutout-model.mjs). Phones download it once, then keep it
- * for offline use (see vite.config.ts).
+ * The model (~44 MB) and engine (~10 MB) are served by this app from /cutout/
+ * (copied there by scripts/copy-cutout-model.mjs). Phones download them once,
+ * then keep them for offline use (see vite.config.ts).
  */
-const config = (progress?: (fraction: number) => void): Config => ({
-  publicPath: new URL('/cutout/', location.href).href,
-  model: 'small', // quickest download and fastest on mid-range phones
-  output: { format: 'image/png' },
-  progress: progress
-    ? (key, current, total) => {
-        if (key === 'fetch:/models/small' && total > 0) progress(current / total)
-        else if (key.startsWith('compute')) progress(COMPUTING)
-        else progress(-1) // other downloads: keeps the timer alive, not shown
-      }
-    : undefined,
-})
-
 const lib = () => import('@imgly/background-removal')
-/** Progress value meaning "the cut-out itself is running" (it reports no steps). */
-const COMPUTING = -2
+const cutoutBase = () => new URL('/cutout/', location.href)
 
-/** Start downloading the model in the background so the first scan is quick. */
-let preloading = false
+/** The files a phone needs: the model, and the engine build every current phone can run. */
+const NEEDED = ['/models/small', '/onnxruntime-web/ort-wasm-simd.wasm']
+
+// After a failure the library would keep handing back the same failed start-up,
+// so each new attempt gets a different number (the library ignores the field itself).
+let attempt = 0
+const config = (): Config =>
+  ({
+    publicPath: cutoutBase().href,
+    model: 'small', // quickest download and fastest on mid-range phones
+    output: { format: 'image/png' },
+    attempt,
+  }) as Config
+
+// ---- Preparing the scanner: one shared download ----------------------------
+
+type Progress = (fraction: number) => void
+let preparing: Promise<void> | null = null
+let prepared = 0
+const listeners = new Set<Progress>()
+
+/**
+ * Download the model and engine (once), so scanning can start straight away.
+ * Starts quietly when the Inventory opens; a scan waits for the same download
+ * instead of starting a second one.
+ */
+export function prepareScanner(): Promise<void> {
+  if (preparing) return preparing
+  preparing = (async () => {
+    log('scanner: preparing')
+    const base = cutoutBase()
+    const res = await fetch(new URL('resources.json', base))
+    if (!res.ok) throw new Error(`resources.json ${res.status}`)
+    const resources = await res.json()
+    const chunks: { hash: string; offsets: [number, number] }[] = NEEDED.flatMap(
+      (key) => resources[key]?.chunks ?? [],
+    )
+    const total = chunks.reduce((sum, c) => sum + c.offsets[1] - c.offsets[0], 0)
+    let loaded = 0
+    const queue = [...chunks]
+    // Three downloads at a time, counting bytes as they arrive, so progress moves smoothly.
+    const worker = async () => {
+      for (let chunk = queue.shift(); chunk; chunk = queue.shift()) {
+        const r = await fetch(new URL(chunk.hash, base))
+        if (!r.ok || !r.body) throw new Error(`download ${r.status}`)
+        const reader = r.body.getReader()
+        for (;;) {
+          const { done, value } = await reader.read()
+          if (done) break
+          loaded += value.byteLength
+          prepared = Math.min(1, loaded / total)
+          listeners.forEach((l) => l(prepared))
+        }
+      }
+    }
+    await Promise.all([worker(), worker(), worker()])
+    prepared = 1
+    log('scanner: ready')
+  })().catch((err) => {
+    log(`scanner: preparing failed (${err instanceof Error ? err.message : String(err)})`)
+    preparing = null // try again next time
+    throw err
+  })
+  return preparing
+}
+
+/** Called when the Inventory opens. Skipped when the phone asks to save data. */
 export function preloadCutoutModel() {
-  if (preloading) return
-  preloading = true
   const nav = navigator as Navigator & { connection?: { saveData?: boolean } }
   if (nav.connection?.saveData) return
-  lib()
-    .then((m) => m.preload(config()))
-    .catch(() => {
-      preloading = false // not fatal: the model is fetched again when someone scans
-    })
+  prepareScanner().catch(() => {})
+}
+
+/** Wait for the download, but give up if no data arrives for 60 seconds. */
+function waitForDownload(onProgress?: Progress): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let idle = setTimeout(() => reject(new Error('download stalled')), 60_000)
+    const listener: Progress = (fraction) => {
+      clearTimeout(idle)
+      idle = setTimeout(() => reject(new Error('download stalled')), 60_000)
+      onProgress?.(fraction)
+    }
+    listeners.add(listener)
+    onProgress?.(prepared)
+    prepareScanner()
+      .then(resolve, reject)
+      .finally(() => {
+        clearTimeout(idle)
+        listeners.delete(listener)
+      })
+  })
+}
+
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out`)), ms)
+    promise.then(
+      (v) => (clearTimeout(timer), resolve(v)),
+      (e) => (clearTimeout(timer), reject(e)),
+    )
+  })
 }
 
 export interface CutoutResult {
@@ -44,33 +120,17 @@ export interface CutoutResult {
 }
 
 /** Remove the background, then trim the empty space around the object. */
-export async function makeCutout(photo: Blob, onProgress?: (fraction: number) => void): Promise<CutoutResult> {
+export async function makeCutout(photo: Blob, onProgress?: Progress): Promise<CutoutResult> {
   try {
+    await waitForDownload(onProgress)
+    onProgress?.(1)
     const { removeBackground } = await lib()
-    // Never wait forever: give up if nothing happens for 45 seconds (e.g. the model
-    // download stalls on poor wifi), or after 3 minutes in total, and keep the photo.
-    const png = await new Promise<Blob>((resolve, reject) => {
-      const fail = () => reject(new Error('Background removal timed out'))
-      const total = setTimeout(fail, 180_000)
-      let idle = setTimeout(fail, 45_000)
-      const progress = (fraction: number) => {
-        clearTimeout(idle)
-        // The cut-out reports no steps, so only the 3-minute limit applies while it runs.
-        if (fraction !== COMPUTING) idle = setTimeout(fail, 45_000)
-        if (fraction >= 0) onProgress?.(fraction)
-      }
-      const done = () => {
-        clearTimeout(total)
-        clearTimeout(idle)
-      }
-      removeBackground(photo, config(progress))
-        .then((b) => (done(), resolve(b)))
-        .catch((e) => (done(), reject(e)))
-    })
+    const png = await withTimeout(removeBackground(photo, config()), 180_000, 'cut-out')
     const trimmed = await trimTransparent(png)
     if (trimmed) return { image: trimmed, removed: true }
   } catch (err) {
-    console.warn('Background removal failed, keeping the photo.', err)
+    log(`cutout failed (${err instanceof Error ? err.message : String(err)}), keeping the photo`)
+    attempt++
   }
   return { image: await circleCrop(photo), removed: false }
 }

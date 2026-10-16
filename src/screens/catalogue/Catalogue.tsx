@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { fitForUpload, makeCutout } from '../../cutout'
+import { fitForUpload, makeCutout, preloadCutoutModel } from '../../cutout'
 import { addLot, type Draft } from '../../db'
 import { href, navigate } from '../../router'
 import { showActiveTab } from '../Inventory'
@@ -22,6 +22,8 @@ export function Catalogue() {
   const [download, setDownload] = useState<number | null>(null)
   const alive = useRef(true)
   useEffect(() => () => void (alive.current = false), [])
+  // Start (or keep) downloading the scanner while the visitor frames the object.
+  useEffect(preloadCutoutModel, [])
 
   const onPhoto = async (photo: Blob) => {
     setStep({ name: 'processing' })
