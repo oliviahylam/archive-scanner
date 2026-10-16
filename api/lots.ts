@@ -24,11 +24,29 @@ function env(suffix: string): string | undefined {
   return key ? process.env[key] : undefined
 }
 
-function store(): ArchiveStore | null {
+/** Upstash REST address and token, from REST settings or from a rediss://default:TOKEN@host URL. */
+function redisSettings(): { url: string; token: string } | null {
   const url = env('REST_API_URL') ?? process.env.UPSTASH_REDIS_REST_URL
   const token = env('REST_API_TOKEN') ?? process.env.UPSTASH_REDIS_REST_TOKEN
-  if (!url || !token || !process.env.BLOB_READ_WRITE_TOKEN) return null
-  const redis = new Redis({ url, token })
+  if (url && token) return { url, token }
+  const redisUrl = Object.values(process.env).find((v) => v && /^rediss?:\/\/.*upstash\.io/.test(v))
+  if (!redisUrl) return null
+  const parsed = new URL(redisUrl)
+  return parsed.password ? { url: `https://${parsed.hostname}`, token: decodeURIComponent(parsed.password) } : null
+}
+
+/** What's missing, for the status page. Names only, never values. */
+function missing(): string[] {
+  return [
+    !process.env.BLOB_READ_WRITE_TOKEN && 'photos (Blob store)',
+    !redisSettings() && 'lot details (Upstash for Redis)',
+  ].filter((m): m is string => Boolean(m))
+}
+
+function store(): ArchiveStore | null {
+  const settings = redisSettings()
+  if (!settings || !process.env.BLOB_READ_WRITE_TOKEN) return null
+  const redis = new Redis(settings)
   return {
     async listLots() {
       const all = await redis.hgetall<Record<string, Lot>>(LOTS_KEY)
@@ -51,7 +69,7 @@ function store(): ArchiveStore | null {
 
 export async function GET() {
   const s = store()
-  if (!s) return notConfigured()
+  if (!s) return notConfigured(missing())
   try {
     return await handleList(s)
   } catch (err) {
@@ -62,7 +80,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const s = store()
-  if (!s) return notConfigured()
+  if (!s) return notConfigured(missing())
   try {
     return await handleAdd(request, s)
   } catch (err) {

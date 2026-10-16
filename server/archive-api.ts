@@ -31,7 +31,7 @@ const json = (body: unknown, status = 200) =>
     headers: { 'content-type': 'application/json', 'cache-control': 'no-store' },
   })
 
-export const notConfigured = () => json({ error: 'not-configured' }, 503)
+export const notConfigured = (missing: string[] = []) => json({ error: 'not-configured', missing }, 503)
 
 /** GET: every visitor lot, newest first. */
 export async function handleList(store: ArchiveStore): Promise<Response> {
